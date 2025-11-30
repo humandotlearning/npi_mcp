@@ -1,23 +1,46 @@
-# NPI MCP Server for CredentialWatch
+# NPI MCP Server Explanation
 
-This MCP server (`npi-mcp`) provides a normalized interface to the NPPES NPI Registry API, allowing the CredentialWatch agent system to search for healthcare providers and retrieve detailed provider information.
+## Architecture
 
-## How it works
+This project implements a Model Context Protocol (MCP) server that acts as a bridge between an AI Agent and the NPPES NPI Registry.
 
-The server implements the Model Context Protocol (MCP) using HTTP + SSE. It exposes two tools:
+1.  **Agent (Client)**: An AI agent (e.g., LangGraph) running in a separate environment connects to this MCP server.
+2.  **MCP Server (`npi_mcp_server`)**: This server, running in a Hugging Face Space, exposes tools defined in the MCP specification (`search_npi_providers`, `get_npi_provider`).
+3.  **Modal NPI API (`NPI_API`)**: The MCP server does not call the NPPES Registry directly. Instead, it forwards requests to a Modal-hosted FastAPI service (`NPI_API`). This Modal service handles the complex logic of querying the NPPES API and normalizing the data.
+4.  **NPPES Registry**: The ultimate source of truth for provider data.
 
-1. **`search_providers`**: Searches for providers using a flexible query string (handling names and organization names) along with optional filters for state and taxonomy. It aggregates results from both Individual (NPI-1) and Organization (NPI-2) searches and normalizes the output.
-2. **`get_provider_by_npi`**: Retrieves full details for a specific NPI, including all addresses and taxonomies, normalized into a clean JSON structure.
+**Flow:**
+`Agent` -> `MCP Server (this repo)` -> `Modal NPI API` -> `NPPES Registry`
 
-## Deployment
+## Tools
 
-The server is built with **FastAPI** and uses **uv** for dependency management. It is designed to be deployed as a stateless service (e.g., on Hugging Face Spaces).
+### 1. `search_npi_providers`
 
-### Endpoints
-- `/sse`: The MCP SSE endpoint for connecting agents.
-- `/messages`: The endpoint for sending JSON-RPC messages (handled via the SSE session).
-- `/healthz`: A simple health check endpoint.
+Searches for healthcare providers.
 
-## Usage
+**Arguments:**
+*   `query` (str): Name or organization name.
+*   `state` (str, optional): 2-letter state code.
+*   `taxonomy` (str, optional): Taxonomy code.
 
-Agents connect to the `/sse` endpoint to establish a session and discover tools. They can then invoke tools by sending JSON-RPC requests to the `/messages` endpoint (linked via session ID).
+**Example Invocation (JSON arguments):**
+```json
+{
+  "query": "Mayo Clinic",
+  "state": "MN"
+}
+```
+
+### 2. `get_npi_provider`
+
+Retrieves details for a specific NPI.
+
+**Arguments:**
+*   `npi` (str): 10-digit NPI number.
+
+**Example Invocation (JSON arguments):**
+```json
+{
+  "npi": "1234567890"
+}
+```

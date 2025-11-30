@@ -11,7 +11,8 @@ class SearchProvidersArgs(BaseModel):
 class GetProviderArgs(BaseModel):
     npi: str = Field(..., description="The 10-digit NPI number.")
 
-# --- Normalized Response Models ---
+# --- NPI API Response Models ---
+# These mirror the structure returned by the Modal NPI_API.
 
 class Address(BaseModel):
     line1: str
@@ -28,6 +29,9 @@ class ProviderSummary(BaseModel):
     primary_taxonomy: Optional[str] = None
     primary_specialty: Optional[str] = None
     primary_address: Address
+
+class SearchProvidersResponse(BaseModel):
+    results: List[ProviderSummary]
 
 class Taxonomy(BaseModel):
     code: str
