@@ -37,6 +37,8 @@ async def search_providers(
 
     # Remove None values
     payload = {k: v for k, v in payload.items() if v is not None}
+    
+    logger.info(f"Searching providers with payload: {payload}")
 
     async with httpx.AsyncClient() as client:
         try:
@@ -44,6 +46,7 @@ async def search_providers(
             response.raise_for_status()
 
             data = response.json()
+            logger.info(f"Received response from NPI API: {len(data.get('results', []))} results found.")
             # Expecting: { "results": [ ... ] }
             return SearchProvidersResponse(**data).results
 
