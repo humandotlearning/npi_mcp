@@ -79,5 +79,59 @@ with gr.Blocks() as demo:
             outputs=get_output
         )
 
+    with gr.Tab("Debug"):
+        gr.Markdown("## Connectivity Test")
+        debug_btn = gr.Button("Run Diagnostics")
+        debug_output = gr.Textbox(label="Logs", lines=20)
+        
+        async def run_diagnostics():
+            import httpx
+            import subprocess
+            import json
+            from npi_mcp_server.config import NPI_API_BASE_URL
+            
+            logs = []
+            logs.append(f"Base URL: {NPI_API_BASE_URL}")
+            
+            url = f"{NPI_API_BASE_URL.rstrip('/')}/search_providers"
+            payload = {
+                "query": "SHELLEY AKEY",
+                "state": "AZ",
+                "taxonomy": "363LN0000X"
+            }
+            headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+            }
+            
+            # Test 1: Python httpx
+            logs.append("\n--- Test 1: Python httpx ---")
+            try:
+                async with httpx.AsyncClient() as client:
+                    response = await client.post(url, json=payload, headers=headers, timeout=30.0)
+                    logs.append(f"Status: {response.status_code}")
+                    logs.append(f"Response: {response.text}")
+            except Exception as e:
+                logs.append(f"Error: {e}")
+                
+            # Test 2: System curl
+            logs.append("\n--- Test 2: System curl ---")
+            try:
+                cmd = [
+                    "curl", "-v", "-X", "POST", url,
+                    "-H", "Content-Type: application/json",
+                    "-H", f"User-Agent: {headers['User-Agent']}",
+                    "-d", json.dumps(payload)
+                ]
+                result = subprocess.run(cmd, capture_output=True, text=True)
+                logs.append(f"Return Code: {result.returncode}")
+                logs.append(f"Stdout: {result.stdout}")
+                logs.append(f"Stderr: {result.stderr}")
+            except Exception as e:
+                logs.append(f"Curl Error: {e}")
+                
+            return "\n".join(logs)
+
+        debug_btn.click(fn=run_diagnostics, outputs=debug_output)
+
 if __name__ == "__main__":
     demo.launch(mcp_server=True)
