@@ -15,12 +15,13 @@ class GetProviderArgs(BaseModel):
 # These mirror the structure returned by the Modal NPI_API.
 
 class Address(BaseModel):
-    line1: str
-    line2: Optional[str] = None
+    address_1: str
+    address_2: Optional[str] = None
     city: str
     state: str
     postal_code: str
-    country: str
+    country_code: str
+    telephone_number: Optional[str] = None
 
 class ProviderSummary(BaseModel):
     npi: str
