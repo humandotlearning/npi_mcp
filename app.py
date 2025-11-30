@@ -57,6 +57,17 @@ with gr.Blocks() as demo:
             outputs=search_output
         )
 
+        gr.Examples(
+            examples=[
+                ["SHELLEY AKEY", "AZ", "363LN0000X"],
+                ["KATHERYN ALIOTO", "CA", "101YA0400X"],
+                ["Counselor", "CA", ""],
+                ["Physical Therapist", "WA", "225100000X"],
+            ],
+            inputs=[query_input, state_input, taxonomy_input],
+            label="Try Examples"
+        )
+
     with gr.Tab("Get Provider by NPI"):
         npi_input = gr.Textbox(label="NPI", placeholder="10-digit NPI")
         get_btn = gr.Button("Get Details")
