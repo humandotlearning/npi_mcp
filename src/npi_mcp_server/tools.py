@@ -39,14 +39,18 @@ async def search_providers(
     payload = {k: v for k, v in payload.items() if v is not None}
     
     logger.info(f"Searching providers with payload: {payload}")
+    
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+    }
 
     async with httpx.AsyncClient() as client:
         try:
-            response = await client.post(url, json=payload, timeout=30.0)
+            response = await client.post(url, json=payload, headers=headers, timeout=30.0)
             response.raise_for_status()
 
             data = response.json()
-            logger.info(f"Received response from NPI API: {len(data.get('results', []))} results found.")
+            logger.info(f"Received response from NPI API: {data}")
             # Expecting: { "results": [ ... ] }
             return SearchProvidersResponse(**data).results
 
