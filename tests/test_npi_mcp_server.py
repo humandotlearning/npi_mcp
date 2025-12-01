@@ -14,11 +14,11 @@ MOCK_SEARCH_RESPONSE = {
             "primary_taxonomy": "207RC0000X",
             "primary_specialty": "Cardiology",
             "primary_address": {
-                "line1": "123 Main St",
+                "address_1": "123 Main St",
                 "city": "Anytown",
                 "state": "CA",
                 "postal_code": "90210",
-                "country": "US"
+                "country_code": "US"
             }
         }
     ]
@@ -30,11 +30,11 @@ MOCK_PROVIDER_DETAIL = {
     "enumeration_type": "INDIVIDUAL",
     "addresses": [
         {
-            "line1": "123 Main St",
+            "address_1": "123 Main St",
             "city": "Anytown",
             "state": "CA",
             "postal_code": "90210",
-            "country": "US"
+            "country_code": "US"
         }
     ],
     "taxonomies": [
