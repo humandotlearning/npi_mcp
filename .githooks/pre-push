@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# Get the name of the remote being pushed to
+remote="$1"
+url="$2"
+
+# Prevent infinite loop: do not run if pushing to 'hf'
+if [ "$remote" = "hf" ]; then
+    exit 0
+fi
+
+# Check if 'hf' remote exists
+if git remote | grep -q "^hf$"; then
+    echo "Syncing main to Hugging Face Spaces..."
+    # Use --no-verify to avoid re-triggering hooks (though the remote check handles it too)
+    git push --no-verify hf main
+else
+    # Optional: Inform the user that hf push is skipped
+    echo "Remote 'hf' not found. Skipping push to Hugging Face."
+fi
+
+exit 0
